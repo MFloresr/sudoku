@@ -22,6 +22,9 @@ Hecho con Django, plantillas con Tailwind CSS + daisyUI y Alpine.js.
   - Resolvedor por vuelta atrás, que comprueba que la solución es única.
   - Calificador que resuelve como una persona (singles, candidatos bloqueados, parejas) para asignar la dificultad.
   - Generador de sudokus nuevos por dificultad.
+- **Contenido propio**: los 424 sudokus publicados (237 fáciles, 127 medios y 60 difíciles)
+  los ha generado y calificado este motor (`generar_sudokus --semilla 2026`); no se usan
+  datasets de terceros.
 - **Admin**: alta de sudokus validada (solución única y dificultad calculada) y consulta de partidas.
 
 ## Estructura
@@ -44,7 +47,7 @@ python -m venv .venv
 .venv\Scripts\activate           # Windows  (Linux/macOS: source .venv/bin/activate)
 pip install -r requirements.txt
 python manage.py migrate
-python manage.py generar_sudokus --facil 60 --media 60 --dificil 60 --semilla 2026
+python manage.py generar_sudokus --facil 237 --media 127 --dificil 60 --semilla 2026
 python manage.py createsuperuser
 set DJANGO_DEBUG=1                 # PowerShell: $env:DJANGO_DEBUG = "1"
 python manage.py runserver
