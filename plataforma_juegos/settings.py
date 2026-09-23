@@ -125,7 +125,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # con una contraseña de aplicación); sin ellas, los correos salen en la consola.
 
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "").replace(" ", "")
+# Sin espacios ni saltos de línea: Google muestra la contraseña de aplicación en grupos de 4
+EMAIL_HOST_PASSWORD = "".join(os.environ.get("EMAIL_HOST_PASSWORD", "").split())
+EMAIL_HOST_USER = EMAIL_HOST_USER.strip()
 
 if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
