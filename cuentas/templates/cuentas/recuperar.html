@@ -1,0 +1,12 @@
+{% extends "cuentas/_marco.html" %}
+{% block title %}Recuperar contraseña · Sudoku{% endblock %}
+{% block titulo %}Recuperar contraseña{% endblock %}
+{% block subtitulo %}Te enviaremos un enlace para elegir una contraseña nueva.{% endblock %}
+{% block cuerpo %}
+<form method="post" class="flex flex-col gap-3.5" novalidate>
+  {% csrf_token %}
+  {% include "cuentas/_campos.html" %}
+  <button type="submit" class="btn mt-1.5 h-13.5 rounded-2xl border-0 bg-tinta text-base font-extrabold text-white">Enviar enlace</button>
+  <a href="{% url 'entrar' %}" class="btn btn-ghost h-12 rounded-2xl font-bold">Volver</a>
+</form>
+{% endblock %}

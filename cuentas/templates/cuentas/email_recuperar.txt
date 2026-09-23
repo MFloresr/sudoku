@@ -1,0 +1,10 @@
+{% autoescape off %}Hola{% if user.first_name %}, {{ user.first_name }}{% endif %}:
+
+Hemos recibido una solicitud para cambiar la contraseña de tu cuenta de Sudoku.
+Para elegir una nueva, entra en este enlace:
+
+{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+El enlace caduca en 1 hora. Si no lo has pedido tú, ignora este correo:
+tu contraseña no cambiará.
+{% endautoescape %}

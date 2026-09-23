@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load iconos %}
+{% block title %}Perfil · Sudoku{% endblock %}
+{% block content %}
+<main class="mx-auto flex max-w-2xl flex-col gap-5 px-5 pt-6 pb-6 md:pt-10">
+  <header class="flex items-center gap-3.5">
+    <span class="flex size-14 items-center justify-center rounded-full bg-tinta text-[22px] font-extrabold text-papel">{{ user.first_name|default:user.email|first|upper }}</span>
+    <div class="flex flex-col gap-0.5">
+      <h1 class="font-display text-[26px]">{{ user.first_name|default:user.email }}</h1>
+      <span class="text-[13px] text-tenue">Jugando desde {{ user.date_joined|date:"F \d\e Y" }}</span>
+    </div>
+  </header>
+
+  <section aria-label="Resumen" class="grid grid-cols-3 gap-2.5">
+    <div class="flex flex-col gap-0.5 rounded-2xl bg-tinta px-2.5 py-3.5 text-papel"><span class="cifra text-2xl font-extrabold">{{ stats.resueltos }}</span><span class="text-xs opacity-85">resueltos</span></div>
+    <div class="flex flex-col gap-0.5 rounded-2xl border border-linea bg-white px-2.5 py-3.5"><span class="cifra text-2xl font-extrabold">{{ stats.racha }}</span><span class="text-xs text-tenue">{{ stats.racha|pluralize:"día,días" }} de racha</span></div>
+    <div class="flex flex-col gap-0.5 rounded-2xl border border-linea bg-white px-2.5 py-3.5"><span class="cifra text-2xl font-extrabold">{% if stats.exito is None %}—{% else %}{{ stats.exito }} %{% endif %}</span><span class="text-xs text-tenue">sin perder</span></div>
+  </section>
+
+  <section aria-labelledby="t-niveles" class="flex flex-col gap-2">
+    <h2 id="t-niveles" class="text-base font-extrabold">Por dificultad</h2>
+    <div class="overflow-hidden rounded-2xl border border-linea bg-white">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-xs text-tenue">
+            <th scope="col" class="px-3.5 py-2.5 font-bold">Nivel</th>
+            <th scope="col" class="px-1.5 py-2.5 text-right font-bold">Hechos</th>
+            <th scope="col" class="px-1.5 py-2.5 text-right font-bold">Récord</th>
+            <th scope="col" class="px-3.5 py-2.5 text-right font-bold">Media</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for n in stats.niveles %}
+          <tr class="border-t border-linea-suave">
+            <th scope="row" class="px-3.5 py-3 text-left font-extrabold"><span class="mr-2 inline-block size-2 rounded-full {% if n.clave == 'facil' %}bg-facil{% elif n.clave == 'media' %}bg-media{% else %}bg-dificil{% endif %}"></span>{{ n.nombre }}</th>
+            <td class="cifra px-1.5 py-3 text-right">{{ n.hechos }}</td>
+            <td class="cifra px-1.5 py-3 text-right font-extrabold">{{ n.record }}</td>
+            <td class="cifra px-3.5 py-3 text-right text-tenue">{{ n.media }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="t-ultimas" class="flex flex-col gap-2">
+    <h2 id="t-ultimas" class="text-base font-extrabold">Últimas partidas</h2>
+    {% if ultimas %}
+    <ul class="rounded-2xl border border-linea bg-white">
+      {% for u in ultimas %}
+      <li class="border-b border-linea-suave last:border-b-0">
+        <a href="{% url 'ver_partida' u.partida.pk %}" class="flex items-center gap-3 px-3.5 py-3">
+          <span class="flex size-7 items-center justify-center rounded-full {% if u.partida.estado == 'ganada' %}bg-facil-suave text-success{% else %}bg-dificil-suave text-error{% endif %}">
+            {% if u.partida.estado == 'ganada' %}{% icono "check" 16 2.4 %}{% else %}{% icono "cruz" 16 2.4 %}{% endif %}
+          </span>
+          <span class="flex flex-1 flex-col">
+            <span class="text-sm font-bold">{{ u.partida.sudoku.nombre }} · {{ u.partida.sudoku.get_dificultad_display }}</span>
+            <span class="text-xs text-tenue">{{ u.partida.terminada|date:"j M, H:i" }} · {{ u.partida.get_estado_display }}</span>
+          </span>
+          <span class="cifra text-sm font-extrabold">{{ u.tiempo }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="rounded-2xl border border-dashed border-linea bg-white p-5 text-center text-sm text-tenue">Cuando termines una partida aparecerá aquí.</p>
+    {% endif %}
+  </section>
+
+  <form method="post" action="{% url 'salir' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn h-12 w-full rounded-[14px] border-linea bg-white text-[15px] font-bold text-error">{% icono "salir" 20 %}Cerrar sesión</button>
+  </form>
+  {% if user.is_staff %}<a href="{% url 'admin:index' %}" class="text-center text-sm font-bold text-anil">Panel de administración</a>{% endif %}
+</main>
+{% endblock %}

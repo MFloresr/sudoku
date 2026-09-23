@@ -1,0 +1,13 @@
+{% extends "cuentas/_marco.html" %}
+{% block title %}Crear cuenta · Sudoku{% endblock %}
+{% block cuerpo %}
+<nav aria-label="Cuenta" class="grid grid-cols-2 rounded-[14px] bg-neutral p-1">
+  <a href="{% url 'entrar' %}" class="flex h-10.5 items-center justify-center rounded-[10px] font-extrabold text-tenue">Entrar</a>
+  <a href="{% url 'registro' %}" aria-current="page" class="flex h-10.5 items-center justify-center rounded-[10px] bg-white font-extrabold shadow-sm">Crear cuenta</a>
+</nav>
+<form method="post" class="flex flex-col gap-3.5" novalidate>
+  {% csrf_token %}
+  {% include "cuentas/_campos.html" %}
+  <button type="submit" class="btn mt-1.5 h-13.5 rounded-2xl border-0 bg-tinta text-base font-extrabold text-white">Crear cuenta y jugar</button>
+</form>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% if form.non_field_errors %}
+<p role="alert" class="rounded-[14px] bg-error/10 px-4 py-3 text-sm font-semibold text-error">{{ form.non_field_errors|join:" " }}</p>
+{% endif %}
+{% for campo in form %}
+<div class="flex flex-col gap-1.5">
+  <label for="{{ campo.id_for_label }}" class="text-sm font-bold">{{ campo.label }}</label>
+  <input type="{{ campo.field.widget.input_type }}" name="{{ campo.html_name }}" id="{{ campo.id_for_label }}"
+         value="{% if campo.field.widget.input_type != 'password' %}{{ campo.value|default_if_none:'' }}{% endif %}"
+         {% for k, v in campo.field.widget.attrs.items %}{{ k }}="{{ v }}" {% endfor %}
+         {% if campo.field.required %}required{% endif %}
+         {% if campo.errors %}aria-invalid="true" aria-describedby="{{ campo.id_for_label }}-error"{% endif %}
+         class="input h-12.5 w-full rounded-[14px] border-[#CFC8B8] bg-white text-base {% if campo.errors %}input-error{% endif %}">
+  {% if campo.errors %}<p id="{{ campo.id_for_label }}-error" class="text-sm text-error">{{ campo.errors|join:" " }}</p>{% endif %}
+</div>
+{% endfor %}

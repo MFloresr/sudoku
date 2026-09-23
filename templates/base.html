@@ -1,0 +1,55 @@
+{% load static iconos %}<!doctype html>
+<html lang="es" data-theme="papel">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F5F2EA">
+  <title>{% block title %}Sudoku{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block extra_head %}{% endblock %}
+  <script defer src="{% static 'js/alpine.min.js' %}"></script>
+</head>
+<body class="min-h-dvh">
+  {% with seccion=request.resolver_match.url_name %}
+  {% if user.is_authenticated and not sin_navegacion %}
+  <header class="sticky top-0 z-30 hidden border-b border-linea bg-papel-claro/95 backdrop-blur md:block">
+    <div class="mx-auto flex h-17 max-w-6xl items-center justify-between px-8">
+      <a href="{% url 'inicio' %}" class="text-tinta">{% logo %}</a>
+      <nav aria-label="Principal" class="flex items-center gap-1">
+        <a href="{% url 'inicio' %}" class="rounded-xl px-4 py-2.5 font-semibold {% if seccion == 'inicio' %}bg-anil-suave text-anil{% else %}hover:bg-neutral{% endif %}" {% if seccion == 'inicio' %}aria-current="page"{% endif %}>Inicio</a>
+        <a href="{% url 'lista' %}" class="rounded-xl px-4 py-2.5 font-semibold {% if seccion == 'lista' %}bg-anil-suave text-anil{% else %}hover:bg-neutral{% endif %}" {% if seccion == 'lista' %}aria-current="page"{% endif %}>Sudokus</a>
+        <a href="{% url 'perfil' %}" class="rounded-xl px-4 py-2.5 font-semibold {% if seccion == 'perfil' %}bg-anil-suave text-anil{% else %}hover:bg-neutral{% endif %}" {% if seccion == 'perfil' %}aria-current="page"{% endif %}>Perfil</a>
+        <a href="{% url 'perfil' %}" class="ml-2 flex size-10 items-center justify-center rounded-full bg-tinta font-extrabold text-papel" aria-label="Tu perfil">{{ user.first_name|default:user.email|first|upper }}</a>
+      </nav>
+    </div>
+  </header>
+  {% endif %}
+
+  {% if messages %}
+  <div class="pointer-events-none fixed inset-x-0 top-4 z-50 flex flex-col items-center gap-2 px-4" aria-live="polite">
+    {% for m in messages %}
+    <p x-data="{ v: true }" x-init="setTimeout(() => v = false, 5000)" x-show="v" x-transition
+       class="pointer-events-auto rounded-full px-5 py-3 text-sm font-semibold shadow-lg {% if m.level_tag == 'error' %}bg-error text-error-content{% else %}bg-tinta text-papel{% endif %}">{{ m }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="{% if user.is_authenticated and not sin_navegacion %}pb-28 md:pb-0{% endif %}">
+    {% block content %}{% endblock %}
+  </div>
+
+  {% if user.is_authenticated and not sin_navegacion %}
+  <nav aria-label="Principal" class="fixed inset-x-0 bottom-0 z-30 grid grid-cols-3 border-t border-linea bg-papel-claro px-2 pt-2 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:hidden">
+    <a href="{% url 'inicio' %}" class="flex h-13 flex-col items-center justify-center gap-1 text-xs {% if seccion == 'inicio' %}font-extrabold text-anil{% else %}font-semibold text-tenue{% endif %}" {% if seccion == 'inicio' %}aria-current="page"{% endif %}>{% icono "inicio" %}Inicio</a>
+    <a href="{% url 'lista' %}" class="flex h-13 flex-col items-center justify-center gap-1 text-xs {% if seccion == 'lista' %}font-extrabold text-anil{% else %}font-semibold text-tenue{% endif %}" {% if seccion == 'lista' %}aria-current="page"{% endif %}>{% icono "cuadricula" %}Sudokus</a>
+    <a href="{% url 'perfil' %}" class="flex h-13 flex-col items-center justify-center gap-1 text-xs {% if seccion == 'perfil' %}font-extrabold text-anil{% else %}font-semibold text-tenue{% endif %}" {% if seccion == 'perfil' %}aria-current="page"{% endif %}>{% icono "usuario" %}Perfil</a>
+  </nav>
+  {% endif %}
+  {% endwith %}
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

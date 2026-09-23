@@ -1,0 +1,7 @@
+{% extends "cuentas/_marco.html" %}
+{% block title %}Revisa tu correo · Sudoku{% endblock %}
+{% block titulo %}Revisa tu correo{% endblock %}
+{% block subtitulo %}Si el email está registrado, te llegará un enlace para cambiar la contraseña. Caduca en 1 hora. Mira también en Spam.{% endblock %}
+{% block cuerpo %}
+<a href="{% url 'entrar' %}" class="btn h-13.5 rounded-2xl border-0 bg-tinta text-base font-extrabold text-white">Volver a entrar</a>
+{% endblock %}

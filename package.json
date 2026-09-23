@@ -1,0 +1,15 @@
+{
+  "name": "plataforma-juegos",
+  "private": true,
+  "description": "Compila los estilos (Tailwind + daisyUI) y copia Alpine.js a static/",
+  "scripts": {
+    "build": "tailwindcss -i estilos/app.css -o static/css/app.css --minify && node -e \"require('fs').mkdirSync('static/js',{recursive:true});require('fs').copyFileSync('node_modules/alpinejs/dist/cdn.min.js','static/js/alpine.min.js')\"",
+    "dev": "tailwindcss -i estilos/app.css -o static/css/app.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "alpinejs": "^3.15.0",
+    "daisyui": "^5.5.20",
+    "tailwindcss": "^4.3.0"
+  }
+}

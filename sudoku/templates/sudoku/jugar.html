@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static iconos %}
+{% block title %}{{ sudoku.nombre }} · Sudoku{% endblock %}
+{% block extra_head %}<script src="{% static 'js/juego.js' %}"></script>{% endblock %}
+{% block content %}
+{% csrf_token %}
+{{ datos|json_script:"datos-partida" }}
+<main x-data="juegoSudoku(JSON.parse(document.getElementById('datos-partida').textContent))"
+      class="mx-auto flex max-w-6xl flex-col gap-3.5 px-4 pt-4 pb-6 md:flex-row md:items-center md:justify-center md:gap-14 md:px-8 md:pt-10">
+
+  <!-- Cabecera (móvil) -->
+  <header class="flex items-center justify-between gap-2 md:hidden">
+    <a href="{% url 'inicio' %}" aria-label="Volver al inicio" class="btn btn-circle border-linea bg-white">{% icono "atras" 20 2 %}</a>
+    <div class="flex flex-col items-center">
+      <span class="font-display text-xl">{{ sudoku.nombre }}</span>
+      <span class="text-[13px] font-semibold {% if sudoku.dificultad == 'facil' %}text-success{% elif sudoku.dificultad == 'media' %}text-warning{% else %}text-error{% endif %}">{{ sudoku.get_dificultad_display }}</span>
+    </div>
+    <button type="button" @click="pausar()" :aria-label="pausado ? 'Seguir' : 'Pausar'" class="btn btn-circle border-linea bg-white" :disabled="!enCurso">
+      <span x-show="!pausado">{% icono "pausa" 18 2.2 %}</span><span x-show="pausado" x-cloak>{% icono "play" 18 2 %}</span>
+    </button>
+  </header>
+
+  <div class="flex items-center justify-between px-1 md:hidden">
+    <span class="cifra flex items-center gap-1.5 text-[17px] font-bold">{% icono "reloj" 18 2 %}<span x-text="reloj">00:00</span></span>
+    <span class="flex items-center gap-1" :aria-label="`Vidas: ${vidas} de ${vidasTotales}`" role="img">
+      <template x-for="n in vidasTotales"><svg width="22" height="22" viewBox="0 0 24 24" :fill="n <= vidas ? '#C2372B' : 'none'" stroke="#C2372B" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></template>
+    </span>
+  </div>
+
+  <!-- Tablero -->
+  <section aria-label="Tablero" class="relative flex w-full justify-center md:w-auto md:flex-1 md:justify-end">
+    <div class="tablero md:w-[min(38rem,calc(100dvh-9rem))]" :class="pausado && 'blur-md'" role="grid" aria-label="Sudoku de 9 por 9">
+      <template x-for="(v, i) in tablero" :key="i">
+        <button type="button" class="casilla" :class="clases(i)" @click="elegir(i)" :aria-label="etiqueta(i)" :aria-selected="i === sel" role="gridcell">
+          <template x-if="notasDe(i)">
+            <span class="notas" aria-hidden="true"><template x-for="n in 9"><span x-text="notasDe(i).includes(n) ? n : ''"></span></template></span>
+          </template>
+          <span x-text="texto(i)"></span>
+        </button>
+      </template>
+    </div>
+    <div x-show="pausado" x-cloak class="absolute inset-0 flex items-center justify-center">
+      <button type="button" @click="pausar()" class="btn h-14 rounded-2xl border-0 bg-tinta px-8 text-base font-extrabold text-white">{% icono "play" 20 2 %}Seguir jugando</button>
+    </div>
+  </section>
+
+  <!-- Panel -->
+  <aside class="flex flex-col gap-3.5 md:w-85 md:gap-4">
+    <div class="hidden flex-col gap-1 md:flex">
+      <a href="{% url 'inicio' %}" class="mb-2 flex items-center gap-1 text-sm font-bold text-tenue hover:text-tinta">{% icono "atras" 16 2 %}Volver</a>
+      <span class="text-sm font-bold tracking-wider uppercase {% if sudoku.dificultad == 'facil' %}text-success{% elif sudoku.dificultad == 'media' %}text-warning{% else %}text-error{% endif %}">{{ sudoku.get_dificultad_display }}</span>
+      <h1 class="font-display text-[34px]">{{ sudoku.nombre }}</h1>
+    </div>
+
+    <div class="hidden grid-cols-2 gap-2.5 md:grid">
+      <div class="flex flex-col gap-0.5 rounded-[14px] border border-linea bg-white px-4 py-3.5">
+        <span class="text-xs font-semibold text-tenue">Tiempo</span>
+        <span class="flex items-center justify-between">
+          <span class="cifra text-[26px] font-extrabold" x-text="reloj">00:00</span>
+          <button type="button" @click="pausar()" :aria-label="pausado ? 'Seguir' : 'Pausar'" class="btn btn-ghost btn-sm btn-circle" :disabled="!enCurso">
+            <span x-show="!pausado">{% icono "pausa" 16 2.2 %}</span><span x-show="pausado" x-cloak>{% icono "play" 16 2 %}</span>
+          </button>
+        </span>
+      </div>
+      <div class="flex flex-col gap-1.5 rounded-[14px] border border-linea bg-white px-4 py-3.5">
+        <span class="text-xs font-semibold text-tenue">Vidas</span>
+        <span class="flex gap-1" :aria-label="`Vidas: ${vidas} de ${vidasTotales}`" role="img">
+          <template x-for="n in vidasTotales"><svg width="24" height="24" viewBox="0 0 24 24" :fill="n <= vidas ? '#C2372B' : 'none'" stroke="#C2372B" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></template>
+        </span>
+      </div>
+    </div>
+
+    <!-- Herramientas -->
+    <div class="order-1 grid grid-cols-4 gap-2 md:order-2">
+      <button type="button" @click="deshacer()" :disabled="!enCurso || !historial.length" class="flex h-15 flex-col items-center justify-center gap-1 rounded-[14px] text-xs font-semibold disabled:opacity-40 md:border md:border-linea md:bg-white">{% icono "deshacer" %}Deshacer</button>
+      <button type="button" @click="borrar()" :disabled="!enCurso" class="flex h-15 flex-col items-center justify-center gap-1 rounded-[14px] text-xs font-semibold disabled:opacity-40 md:border md:border-linea md:bg-white">{% icono "borrar" %}Borrar</button>
+      <button type="button" @click="modoNotas = !modoNotas" :aria-pressed="modoNotas" :disabled="!enCurso"
+              :class="modoNotas ? 'bg-anil text-white md:border-anil md:bg-anil' : ''"
+              class="flex h-15 flex-col items-center justify-center gap-1 rounded-[14px] text-xs font-bold disabled:opacity-40 md:border md:border-linea md:bg-white">{% icono "lapiz" %}<span>Notas <span x-text="modoNotas ? 'ON' : 'OFF'">OFF</span></span></button>
+      <button type="button" @click="pista()" :disabled="!enCurso" class="flex h-15 flex-col items-center justify-center gap-1 rounded-[14px] text-xs font-semibold disabled:opacity-40 md:border md:border-linea md:bg-white">{% icono "bombilla" %}Pista</button>
+    </div>
+
+    <!-- Teclado numérico -->
+    <div role="group" aria-label="Números" class="order-2 grid grid-cols-9 gap-1 md:order-1 md:grid-cols-3 md:gap-2">
+      <template x-for="n in 9" :key="n">
+        <button type="button" @click="poner(n)" :disabled="!enCurso || cuenta[n] >= 9" :aria-label="`Poner ${n}`"
+                :class="modoNotas ? 'bg-anil-suave text-anil' : 'bg-white'"
+                class="flex h-16 flex-col items-center justify-center gap-0.5 rounded-xl border border-linea disabled:border-transparent disabled:bg-neutral disabled:text-[#A8A396] md:h-19 md:rounded-[14px]">
+          <span class="text-[26px] leading-none font-bold md:text-[32px]" x-text="n"></span>
+          <span class="cifra text-[10px] font-bold opacity-70 md:text-[11px]" x-text="cuenta[n] >= 9 ? '' : 9 - cuenta[n]"></span>
+        </button>
+      </template>
+    </div>
+
+    <p x-show="aviso" x-cloak x-text="aviso" role="alert" class="order-3 rounded-xl bg-error/10 px-3 py-2 text-sm font-semibold text-error"></p>
+    <p class="order-4 hidden text-[13px] leading-relaxed text-tenue md:block">
+      Teclado: números 1–9 para escribir, flechas para moverte, <b>N</b> para notas, <b>Supr</b> para borrar, <b>Ctrl+Z</b> para deshacer.
+    </p>
+    <button type="button" x-show="!enCurso && !finAbierto" x-cloak @click="finAbierto = true" class="order-5 btn h-12 rounded-xl border-0 bg-tinta text-white">Ver resultado</button>
+  </aside>
+
+  <!-- Fin de la partida -->
+  <div x-show="finAbierto" x-cloak x-transition.opacity class="fixed inset-0 z-40 flex items-end justify-center bg-tinta/55 md:items-center" @click.self="finAbierto = false">
+    <section role="dialog" aria-modal="true" :aria-label="estado === 'ganada' ? 'Sudoku resuelto' : 'Sin vidas'"
+             class="flex w-full max-w-md flex-col items-center gap-4.5 rounded-t-[28px] bg-papel px-6 pt-3.5 pb-8 text-center md:rounded-[28px] md:pt-8">
+      <span class="h-1.5 w-10 rounded-full bg-linea md:hidden"></span>
+
+      <template x-if="estado === 'ganada'">
+        <div class="flex w-full flex-col items-center gap-4.5">
+          <span class="flex size-19 items-center justify-center rounded-full bg-facil-suave text-success">{% icono "check" 40 2.2 %}</span>
+          <div class="flex flex-col gap-1.5">
+            <h2 class="font-display text-[32px]">¡Resuelto!</h2>
+            <p class="text-[15px] text-tenue">{{ sudoku.nombre }} · {{ sudoku.get_dificultad_display }}</p>
+          </div>
+          <span x-show="nuevoRecord" class="rounded-[10px] bg-media-suave px-3 py-1.5 text-[13px] font-extrabold text-warning">Nuevo récord en {{ sudoku.get_dificultad_display }}</span>
+          <div class="grid w-full grid-cols-3 gap-2.5">
+            <div class="flex flex-col gap-0.5 rounded-[14px] border border-linea bg-white px-1.5 py-3"><span class="cifra text-[22px] font-extrabold" x-text="reloj"></span><span class="text-xs text-tenue">tiempo</span></div>
+            <div class="flex flex-col gap-0.5 rounded-[14px] border border-linea bg-white px-1.5 py-3"><span class="cifra text-[22px] font-extrabold" x-text="errores"></span><span class="text-xs text-tenue" x-text="errores === 1 ? 'error' : 'errores'"></span></div>
+            <div class="flex flex-col gap-0.5 rounded-[14px] border border-linea bg-white px-1.5 py-3"><span class="cifra text-[22px] font-extrabold" x-text="pistas"></span><span class="text-xs text-tenue" x-text="pistas === 1 ? 'pista' : 'pistas'"></span></div>
+          </div>
+          <div class="flex w-full flex-col gap-2">
+            <form method="post" action="{% url 'nueva_partida' %}">{% csrf_token %}<input type="hidden" name="dificultad" value="{{ sudoku.dificultad }}">
+              <button type="submit" class="btn h-13.5 w-full rounded-2xl border-0 bg-tinta text-base font-extrabold text-white">Otro sudoku {% if sudoku.dificultad == 'facil' %}fácil{% elif sudoku.dificultad == 'media' %}medio{% else %}difícil{% endif %}</button>
+            </form>
+            <a href="{% url 'inicio' %}" class="btn btn-ghost h-12 rounded-2xl text-[15px] font-bold">Volver al inicio</a>
+          </div>
+        </div>
+      </template>
+
+      <template x-if="estado === 'perdida'">
+        <div class="flex w-full flex-col items-center gap-4.5">
+          <span class="flex size-19 items-center justify-center rounded-full bg-dificil-suave text-error">{% icono "corazon" 38 1.9 %}</span>
+          <div class="flex flex-col gap-1.5">
+            <h2 class="font-display text-[32px]">Sin vidas</h2>
+            <p class="text-[15px] leading-relaxed text-tenue">Has cometido {{ datos.vidasTotales }} errores en el {{ sudoku.nombre }}.<br>Llevabas <span x-text="reloj"></span>.</p>
+          </div>
+          <div class="flex w-full flex-col gap-2">
+            <form method="post" action="{% url 'reintentar' sudoku.pk %}">{% csrf_token %}
+              <button type="submit" class="btn h-13.5 w-full rounded-2xl border-0 bg-tinta text-base font-extrabold text-white">Reintentar este sudoku</button>
+            </form>
+            <a href="{% url 'lista' %}" class="btn btn-ghost h-12 rounded-2xl text-[15px] font-bold">Probar otro</a>
+          </div>
+          <p class="text-xs text-tenue">Al reintentar empiezas de cero, con {{ datos.vidasTotales }} vidas.</p>
+        </div>
+      </template>
+
+      <button type="button" @click="finAbierto = false" class="text-sm font-bold text-anil">Ver el tablero</button>
+    </section>
+  </div>
+</main>
+{% endblock %}

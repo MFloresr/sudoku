@@ -1,0 +1,15 @@
+{% extends "cuentas/_marco.html" %}
+{% block title %}Entrar · Sudoku{% endblock %}
+{% block cuerpo %}
+<nav aria-label="Cuenta" class="grid grid-cols-2 rounded-[14px] bg-neutral p-1">
+  <a href="{% url 'entrar' %}" aria-current="page" class="flex h-10.5 items-center justify-center rounded-[10px] bg-white font-extrabold shadow-sm">Entrar</a>
+  <a href="{% url 'registro' %}" class="flex h-10.5 items-center justify-center rounded-[10px] font-extrabold text-tenue">Crear cuenta</a>
+</nav>
+<form method="post" class="flex flex-col gap-3.5" novalidate>
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+  {% include "cuentas/_campos.html" %}
+  <a href="{% url 'recuperar' %}" class="self-end text-sm font-bold text-anil">¿Olvidaste la contraseña?</a>
+  <button type="submit" class="btn mt-1.5 h-13.5 rounded-2xl border-0 bg-tinta text-base font-extrabold text-white">Entrar</button>
+</form>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "cuentas/_marco.html" %}
+{% block title %}Nueva contraseña · Sudoku{% endblock %}
+{% block titulo %}Nueva contraseña{% endblock %}
+{% block subtitulo %}{% if validlink %}Elige una contraseña de al menos 8 caracteres.{% else %}Este enlace ya no es válido: puede que haya caducado o que ya se haya usado.{% endif %}{% endblock %}
+{% block cuerpo %}
+{% if validlink %}
+<form method="post" class="flex flex-col gap-3.5" novalidate>
+  {% csrf_token %}
+  {% include "cuentas/_campos.html" %}
+  <button type="submit" class="btn mt-1.5 h-13.5 rounded-2xl border-0 bg-tinta text-base font-extrabold text-white">Guardar contraseña</button>
+</form>
+{% else %}
+<a href="{% url 'recuperar' %}" class="btn h-13.5 rounded-2xl border-0 bg-tinta text-base font-extrabold text-white">Pedir otro enlace</a>
+{% endif %}
+{% endblock %}

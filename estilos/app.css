@@ -1,0 +1,233 @@
+@import "tailwindcss";
+@source "../templates";
+@source "../sudoku/templates";
+@source "../cuentas/templates";
+@source "../static/js/juego.js";
+
+@plugin "daisyui" {
+  themes: false;
+}
+
+/* Tema "papel": papel cálido, tinta azul oscuro y añil para los números del jugador */
+@plugin "daisyui/theme" {
+  name: "papel";
+  default: true;
+  color-scheme: light;
+  --color-base-100: #ffffff;
+  --color-base-200: #f5f2ea;
+  --color-base-300: #dcd6c8;
+  --color-base-content: #1d2433;
+  --color-primary: #1d2433;
+  --color-primary-content: #ffffff;
+  --color-secondary: #3346c4;
+  --color-secondary-content: #ffffff;
+  --color-accent: #7c8cf0;
+  --color-accent-content: #1d2433;
+  --color-neutral: #e9e4d8;
+  --color-neutral-content: #1d2433;
+  --color-info: #3346c4;
+  --color-info-content: #ffffff;
+  --color-success: #1f5e43;
+  --color-success-content: #ffffff;
+  --color-warning: #8a5a12;
+  --color-warning-content: #ffffff;
+  --color-error: #b3261e;
+  --color-error-content: #ffffff;
+  --radius-selector: 0.75rem;
+  --radius-field: 0.875rem;
+  --radius-box: 1.25rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Young Serif", Georgia, serif;
+  --color-papel: #f5f2ea;
+  --color-papel-claro: #fbf9f4;
+  --color-linea: #dcd6c8;
+  --color-linea-suave: #eee9de;
+  --color-tinta: #1d2433;
+  --color-tenue: #5b6070;
+  --color-anil: #3346c4;
+  --color-anil-suave: #e4e7fb;
+  --color-facil: #2e7d5b;
+  --color-facil-suave: #ddf0e6;
+  --color-media: #b7791f;
+  --color-media-suave: #f6ebd5;
+  --color-dificil: #c2372b;
+  --color-dificil-suave: #fbe1dd;
+}
+
+@layer base {
+  body {
+    @apply bg-papel text-tinta antialiased;
+  }
+  .cifra {
+    font-variant-numeric: tabular-nums;
+  }
+  [x-cloak] {
+    display: none !important;
+  }
+}
+
+/* ---------- Tablero ---------- */
+.tablero {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  width: min(100%, 38rem);
+  aspect-ratio: 1;
+  border: 3px solid var(--color-tinta);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  user-select: none;
+  touch-action: manipulation;
+}
+.casilla {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #d9d4c7;
+  border-bottom: 1px solid #d9d4c7;
+  background: #fff;
+  font-size: clamp(1.1rem, 5.4vw, 2.1rem);
+  font-weight: 600;
+  color: var(--color-anil);
+  cursor: pointer;
+  padding: 0;
+  font-variant-numeric: tabular-nums;
+}
+/* nth-of-type: Alpine deja un <template> dentro del tablero que no es casilla */
+.casilla:nth-of-type(9n + 3),
+.casilla:nth-of-type(9n + 6) {
+  border-right: 2px solid var(--color-tinta);
+}
+.casilla:nth-of-type(9n) {
+  border-right: none;
+}
+.casilla:nth-of-type(n + 19):nth-of-type(-n + 27),
+.casilla:nth-of-type(n + 46):nth-of-type(-n + 54) {
+  border-bottom: 2px solid var(--color-tinta);
+}
+.casilla:nth-of-type(n + 73) {
+  border-bottom: none;
+}
+.casilla.dada {
+  color: var(--color-tinta);
+  font-weight: 800;
+}
+.casilla.zona {
+  background: #eef0fb;
+}
+.casilla.igual {
+  background: #d3d9fa;
+}
+.casilla.sel {
+  background: #b7c1f6;
+}
+.casilla.error {
+  background: #fbe1dd;
+  color: #b3261e;
+  animation: temblor 0.3s;
+}
+.casilla.acierto {
+  animation: brillo 0.5s;
+}
+.casilla:focus-visible {
+  outline: 3px solid var(--color-anil);
+  outline-offset: -3px;
+  z-index: 1;
+}
+.notas {
+  position: absolute;
+  inset: 2px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  font-size: clamp(0.5rem, 2.2vw, 0.8rem);
+  font-weight: 700;
+  color: var(--color-tenue);
+  line-height: 1;
+}
+.notas span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes temblor {
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+@keyframes brillo {
+  from { background: #c9f0dc; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .casilla.error,
+  .casilla.acierto {
+    animation: none;
+  }
+}
+
+/* Mini tablero de las tarjetas */
+.mini {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  border: 1.5px solid var(--color-tinta);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.mini span {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 0.5px solid var(--color-linea);
+  border-bottom: 0.5px solid var(--color-linea);
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: var(--color-anil);
+}
+.mini span.dada {
+  color: var(--color-tinta);
+}
+.mini span:nth-child(9n + 3),
+.mini span:nth-child(9n + 6) {
+  border-right: 1.5px solid var(--color-tinta);
+}
+.mini span:nth-child(9n) {
+  border-right: none;
+}
+.mini span:nth-child(n + 19):nth-child(-n + 27),
+.mini span:nth-child(n + 46):nth-child(-n + 54) {
+  border-bottom: 1.5px solid var(--color-tinta);
+}
+.mini.oscuro {
+  border-color: #f5f2ea;
+  background: #26304a;
+}
+.mini.oscuro span {
+  border-color: #3a4563;
+  color: transparent;
+}
+.mini.oscuro span.dada {
+  background: #f5f2ea;
+}
+.mini.oscuro span.puesta {
+  background: #7c8cf0;
+}
+.mini.oscuro span:nth-child(9n + 3),
+.mini.oscuro span:nth-child(9n + 6) {
+  border-right-color: #f5f2ea;
+}
+.mini.oscuro span:nth-child(n + 19):nth-child(-n + 27),
+.mini.oscuro span:nth-child(n + 46):nth-child(-n + 54) {
+  border-bottom-color: #f5f2ea;
+}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load iconos %}
+{% block title %}Sudokus · Sudoku{% endblock %}
+{% block content %}
+<main class="mx-auto flex max-w-5xl flex-col gap-4 px-5 pt-6 pb-6 md:pt-10">
+  <h1 class="font-display text-3xl md:text-4xl">Sudokus</h1>
+
+  <nav aria-label="Estado" class="grid grid-cols-3 rounded-[14px] bg-neutral p-1 md:max-w-md">
+    {% for clave, texto in pestanas %}
+    <a href="?ver={{ clave }}{% if dificultad %}&dificultad={{ dificultad }}{% endif %}"
+       class="flex h-10 items-center justify-center rounded-[10px] text-sm {% if pestana == clave %}bg-white font-extrabold shadow-sm{% else %}font-semibold text-tenue{% endif %}"
+       {% if pestana == clave %}aria-current="page"{% endif %}>{{ texto }}</a>
+    {% endfor %}
+  </nav>
+
+  <nav aria-label="Dificultad" class="flex flex-wrap gap-2">
+    <a href="?ver={{ pestana }}" class="flex h-9 items-center rounded-full border px-3.5 text-[13px] font-bold {% if not dificultad %}border-tinta bg-tinta text-white{% else %}border-linea bg-white{% endif %}" {% if not dificultad %}aria-current="true"{% endif %}>Todos</a>
+    {% for clave, texto in dificultades %}
+    <a href="?ver={{ pestana }}&dificultad={{ clave }}" class="flex h-9 items-center rounded-full border px-3.5 text-[13px] font-bold {% if dificultad == clave %}border-tinta bg-tinta text-white{% else %}border-linea bg-white{% endif %}" {% if dificultad == clave %}aria-current="true"{% endif %}>{{ texto }}</a>
+    {% endfor %}
+  </nav>
+
+  {% if tarjetas %}
+  <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+    {% for t in tarjetas %}
+    <li>
+      <a href="{{ t.url }}" class="flex h-full flex-col gap-2.5 rounded-2xl border border-linea bg-white p-3 transition hover:border-tinta">
+        {% include "sudoku/_mini.html" with mini=t.mini %}
+        <span class="flex items-center justify-between gap-1.5">
+          <span class="text-sm font-extrabold">{{ t.sudoku.nombre }}</span>
+          <span class="rounded-lg px-2 py-0.5 text-[11px] font-extrabold {% if t.sudoku.dificultad == 'facil' %}bg-facil-suave text-success{% elif t.sudoku.dificultad == 'media' %}bg-media-suave text-warning{% else %}bg-dificil-suave text-error{% endif %}">{{ t.sudoku.get_dificultad_display }}</span>
+        </span>
+        <span class="cifra text-xs text-tenue">{{ t.estado }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+
+  {% if pagina.has_other_pages %}
+  <nav aria-label="Páginas" class="flex items-center justify-center gap-3 pt-2">
+    {% if pagina.has_previous %}
+    <a class="btn btn-circle border-linea bg-white" aria-label="Página anterior" href="?ver={{ pestana }}{% if dificultad %}&dificultad={{ dificultad }}{% endif %}&pagina={{ pagina.previous_page_number }}">{% icono "atras" 18 2 %}</a>
+    {% endif %}
+    <span class="cifra text-sm font-semibold">Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+    {% if pagina.has_next %}
+    <a class="btn btn-circle border-linea bg-white" aria-label="Página siguiente" href="?ver={{ pestana }}{% if dificultad %}&dificultad={{ dificultad }}{% endif %}&pagina={{ pagina.next_page_number }}">{% icono "adelante" 18 2 %}</a>
+    {% endif %}
+  </nav>
+  {% endif %}
+
+  {% else %}
+  <p class="rounded-2xl border border-dashed border-linea bg-white p-8 text-center text-tenue">
+    {% if pestana == "en_curso" %}No tienes partidas empezadas.{% elif pestana == "resueltos" %}Aún no has resuelto ninguno. ¡Ánimo!{% else %}Has jugado todos los sudokus de esta dificultad.{% endif %}
+  </p>
+  {% endif %}
+</main>
+{% endblock %}

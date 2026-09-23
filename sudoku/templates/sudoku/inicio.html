@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load iconos %}
+{% block title %}Sudoku{% endblock %}
+{% block content %}
+<main class="mx-auto flex max-w-3xl flex-col gap-6 px-5 pt-5 pb-6 md:pt-10">
+  <header class="flex items-center justify-between md:hidden">
+    {% logo %}
+    <a href="{% url 'perfil' %}" aria-label="Tu perfil" class="flex size-10 items-center justify-center rounded-full bg-tinta font-extrabold text-papel">{{ user.first_name|default:user.email|first|upper }}</a>
+  </header>
+
+  <h1 class="font-display text-[32px] leading-tight md:text-5xl">Hola, {{ user.first_name|default:"jugador" }}.<br>¿Una partida?</h1>
+
+  {% if en_curso %}
+  <section aria-label="Partida en curso" class="flex gap-4 rounded-[22px] bg-tinta p-4 text-papel md:p-6">
+    <div class="w-26 shrink-0 md:w-36">{% include "sudoku/_mini.html" with mini=mini clase="oscuro" oscuro=True %}</div>
+    <div class="flex flex-1 flex-col gap-1.5">
+      <span class="text-xs font-bold tracking-wider text-[#AEB8F5] uppercase">Continúa donde lo dejaste</span>
+      <span class="font-display text-xl md:text-2xl">{{ en_curso.sudoku.nombre }} · {{ en_curso.sudoku.get_dificultad_display }}</span>
+      <span class="cifra text-[13px] opacity-85">{{ en_curso.segundos|tiempo }} · {{ en_curso.vidas }} {{ en_curso.vidas|pluralize:"vida,vidas" }} · {{ en_curso.progreso }} %</span>
+      <span class="h-1.5 overflow-hidden rounded-full bg-[#3A4563]"><span class="block h-full bg-accent" style="width: {{ en_curso.progreso }}%"></span></span>
+      <a href="{% url 'jugar' en_curso.sudoku_id %}" class="btn mt-1 h-11 rounded-xl border-0 bg-papel font-extrabold text-tinta hover:bg-white">Continuar</a>
+    </div>
+  </section>
+  {% endif %}
+
+  <section aria-labelledby="t-nueva" class="flex flex-col gap-2.5">
+    <h2 id="t-nueva" class="text-[17px] font-extrabold">Nueva partida</h2>
+    <div class="grid gap-2.5 md:grid-cols-3">
+      {% for n in niveles %}
+      <form method="post" action="{% url 'nueva_partida' %}">
+        {% csrf_token %}
+        <input type="hidden" name="dificultad" value="{{ n.clave }}">
+        <button type="submit" class="flex w-full items-center gap-3.5 rounded-2xl border border-linea bg-white px-4 py-3.5 text-left transition hover:border-tinta md:flex-col md:items-start md:py-5">
+          <span class="flex gap-[3px]" aria-hidden="true">
+            {% for i in "123" %}<span class="h-5.5 w-2 rounded-[3px] {% if forloop.counter <= n.barras %}{% if n.clave == 'facil' %}bg-facil{% elif n.clave == 'media' %}bg-media{% else %}bg-dificil{% endif %}{% else %}bg-linea{% endif %}"></span>{% endfor %}
+          </span>
+          <span class="flex flex-1 flex-col gap-0.5">
+            <span class="text-base font-extrabold">{{ n.nombre }}</span>
+            <span class="text-[13px] text-tenue">{{ n.detalle }}</span>
+          </span>
+          <span class="md:hidden">{% icono "adelante" 20 2 %}</span>
+        </button>
+      </form>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section aria-label="Tus números" class="grid grid-cols-3 gap-2.5 text-center">
+    <div class="flex flex-col gap-0.5"><span class="cifra text-[22px] font-extrabold">{{ stats.resueltos }}</span><span class="text-xs text-tenue">resueltos</span></div>
+    <div class="flex flex-col gap-0.5"><span class="cifra text-[22px] font-extrabold">{{ stats.racha }} {{ stats.racha|pluralize:"día,días" }}</span><span class="text-xs text-tenue">de racha</span></div>
+    <div class="flex flex-col gap-0.5"><span class="cifra text-[22px] font-extrabold">{{ stats.record_facil }}</span><span class="text-xs text-tenue">récord fácil</span></div>
+  </section>
+</main>
+{% endblock %}

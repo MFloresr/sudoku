@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Datos locales
+db.sqlite3
+.env
+.env*.local
+
+# Django
+/static_root/
+
+# Node (solo para compilar los estilos)
+node_modules/
+
+# Editores y herramientas
+.idea/
+.vscode/
+.vercel/
+graphify-out/
