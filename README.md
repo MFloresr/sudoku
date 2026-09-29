@@ -3,6 +3,19 @@
 Juego de sudoku web con cuentas de usuario, partidas guardadas y estadísticas.
 Hecho con Django, plantillas con Tailwind CSS + daisyUI y Alpine.js.
 
+**Demo en línea:** https://sudoku-flores9.vercel.app (crea una cuenta con tu email para jugar).
+
+## Capturas
+
+<p align="center">
+  <img src="docs/capturas/tablero.png" width="640" alt="Tablero de una partida media con notas a lápiz, teclado numérico y vidas">
+  <img src="docs/capturas/tablero-movil.png" width="200" alt="El mismo tablero en móvil, con el teclado numérico bajo el tablero">
+</p>
+<p align="center">
+  <img src="docs/capturas/victoria.png" width="420" alt="Pantalla de partida resuelta con tiempo, errores, pistas y aviso de récord">
+  <img src="docs/capturas/perfil.png" width="420" alt="Perfil con partidas resueltas, racha, porcentaje sin perder y récords por dificultad">
+</p>
+
 ## Funcionalidades
 
 - **Jugar**:
@@ -72,6 +85,10 @@ npm run build      # o "npm run dev" para recompilar al guardar
 python manage.py test
 ```
 
+Incluye 27 pruebas automáticas: el motor del sudoku (resolver, calificar y generar), las
+partidas y la API, las estadísticas, el formulario de administración y las cuentas (registro y
+entrada con email).
+
 ## API de la partida
 
 Todas son `POST` con JSON, requieren sesión y devuelven `{"partida": {...}}` con el
@@ -86,6 +103,9 @@ estado actualizado. Cada petición puede incluir `segundos`, el tiempo de juego 
 | `/partidas/<id>/tiempo/` | `{"segundos": n}` | Guarda el tiempo |
 
 ## Variables de entorno (producción)
+
+La aplicación las lee del entorno del sistema; en `.env.example` tienes un ejemplo con todas
+(no se carga solo: defínelas en tu terminal o en el panel de tu proveedor).
 
 | Variable | Descripción |
 |---|---|
