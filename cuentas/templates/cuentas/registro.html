@@ -1,5 +1,7 @@
 {% extends "cuentas/_marco.html" %}
 {% block title %}Crear cuenta · Sudoku{% endblock %}
+{% block titulo %}Crea tu cuenta{% endblock %}
+{% block subtitulo %}Gratis, en menos de un minuto.{% endblock %}
 {% block cuerpo %}
 <nav aria-label="Cuenta" class="grid grid-cols-2 rounded-[14px] bg-neutral p-1">
   <a href="{% url 'entrar' %}" class="flex h-10.5 items-center justify-center rounded-[10px] font-extrabold text-tenue">Entrar</a>
@@ -10,4 +12,5 @@
   {% include "cuentas/_campos.html" %}
   <button type="submit" class="btn mt-1.5 h-13.5 rounded-2xl border-0 bg-tinta text-base font-extrabold text-white">Crear cuenta y jugar</button>
 </form>
+{% include "cuentas/_demo.html" %}
 {% endblock %}

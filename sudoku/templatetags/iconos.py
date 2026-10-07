@@ -46,3 +46,16 @@ def tiempo(segundos):
     from sudoku.estadisticas import formato_tiempo
 
     return formato_tiempo(segundos)
+
+
+# Tablero de adorno para el panel de las pantallas de cuenta (no es un sudoku jugable)
+_ADORNO_PUZZLE = "530070000600195000098000060800060003400803001700020006060000280000419005000080079"
+_ADORNO_PUESTO = "534070000600195000098000060800060003400803001700020006060000280000419005000080079"
+
+
+@register.simple_tag
+def tablero_adorno():
+    return [
+        {"v": "" if v == "0" else v, "dada": b != "0"}
+        for v, b in zip(_ADORNO_PUESTO, _ADORNO_PUZZLE)
+    ]

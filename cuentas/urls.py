@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     path("entrar/", views.EntrarView.as_view(), name="entrar"),
     path("registro/", views.registro, name="registro"),
+    path("demo/", views.demo, name="demo"),
     path("salir/", auth_views.LogoutView.as_view(), name="salir"),
     path("recuperar/", views.RecuperarView.as_view(), name="recuperar"),
     path("recuperar/enviado/", views.RecuperarEnviadoView.as_view(), name="recuperar_enviado"),
