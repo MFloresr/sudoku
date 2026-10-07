@@ -1,5 +1,7 @@
 {% extends "cuentas/_marco.html" %}
 {% block title %}Entrar · Sudoku{% endblock %}
+{% block titulo %}Inicia sesión{% endblock %}
+{% block subtitulo %}Entra para seguir tu partida y tus récords.{% endblock %}
 {% block cuerpo %}
 <nav aria-label="Cuenta" class="grid grid-cols-2 rounded-[14px] bg-neutral p-1">
   <a href="{% url 'entrar' %}" aria-current="page" class="flex h-10.5 items-center justify-center rounded-[10px] bg-white font-extrabold shadow-sm">Entrar</a>
@@ -12,4 +14,5 @@
   <a href="{% url 'recuperar' %}" class="self-end text-sm font-bold text-anil">¿Olvidaste la contraseña?</a>
   <button type="submit" class="btn mt-1.5 h-13.5 rounded-2xl border-0 bg-tinta text-base font-extrabold text-white">Entrar</button>
 </form>
+{% include "cuentas/_demo.html" %}
 {% endblock %}

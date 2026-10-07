@@ -1,12 +1,35 @@
 {% extends "base.html" %}
 {% load iconos %}
 {% block content %}
-<main class="mx-auto flex min-h-dvh max-w-sm flex-col gap-6 px-6 pt-16 pb-8">
-  <div class="flex flex-col items-center gap-3.5 text-center">
-    {% logo grande=True %}
-    <h1 class="font-display text-[32px]">{% block titulo %}Sudoku{% endblock %}</h1>
-    <p class="text-[15px] text-tenue">{% block subtitulo %}Tu partida y tus récords, guardados en tu cuenta.{% endblock %}</p>
-  </div>
-  {% block cuerpo %}{% endblock %}
-</main>
+<div class="grid min-h-dvh md:grid-cols-[1.05fr_1fr]">
+  <aside class="panel-puntos relative hidden flex-col justify-between gap-10 overflow-hidden bg-tinta p-12 text-papel md:flex lg:p-14">
+    <div class="relative">{% logo %}</div>
+    <div class="relative flex flex-col gap-4">
+      <h2 class="max-w-[12ch] font-display text-5xl leading-[1.04] text-balance lg:text-6xl">Un tablero. Tu ritmo.</h2>
+      <p class="max-w-[38ch] text-papel/75">Guarda tu partida, mide tu tiempo y mira cómo mejoras. Retómala desde cualquier dispositivo.</p>
+      <figure class="mt-6 w-full max-w-[340px] -rotate-2 rounded-[22px] bg-white p-4 text-tinta shadow-[0_30px_60px_-20px_rgb(0_0_0/0.55)]" aria-hidden="true">
+        <div class="mini grande">{% tablero_adorno as casillas %}{% for c in casillas %}<span class="{% if c.dada %}dada{% endif %}">{{ c.v }}</span>{% endfor %}</div>
+        <figcaption class="mt-3 flex items-center justify-between text-[13px] font-bold">
+          <span class="rounded-full bg-facil-suave px-2.5 py-1 text-facil">Fácil</span>
+          <span class="cifra text-tenue">08:32</span>
+          <span class="flex items-center gap-1 text-dificil">{% icono "corazon" 16 2 %}<span class="text-tinta">3 vidas</span></span>
+        </figcaption>
+      </figure>
+    </div>
+    <p class="relative text-[13px] text-papel/65">Todos los sudokus los genera un motor propio, con solución única.</p>
+  </aside>
+
+  <main class="flex items-center justify-center px-5 py-10 md:px-10">
+    <div class="flex w-full max-w-md flex-col gap-6">
+      <div class="flex justify-center md:hidden">{% logo grande=True %}</div>
+      <section class="flex flex-col gap-5 rounded-[24px] border border-linea bg-white p-6 shadow-[0_24px_48px_-28px_rgb(29_36_51/0.35)] md:p-9">
+        <header class="flex flex-col gap-1.5">
+          <h1 class="font-display text-[30px] leading-tight text-balance">{% block titulo %}Sudoku{% endblock %}</h1>
+          <p class="text-[15px] text-tenue">{% block subtitulo %}Tu partida y tus récords, guardados en tu cuenta.{% endblock %}</p>
+        </header>
+        {% block cuerpo %}{% endblock %}
+      </section>
+    </div>
+  </main>
+</div>
 {% endblock %}

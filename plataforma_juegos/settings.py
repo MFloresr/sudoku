@@ -148,3 +148,7 @@ LOGGING = {
     "handlers": {"console": {"class": "logging.StreamHandler"}},
     "root": {"handlers": ["console"], "level": "WARNING"},
 }
+
+# Cuenta de demostración pública (partidas ficticias; ver sudoku/demo.py)
+DEMO_EMAIL = "demo@example.com"
+DEMO_PASSWORD = "demo-sudoku"

@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm
 
@@ -68,3 +69,7 @@ class RecuperarForm(PasswordResetForm):
         label="Email",
         widget=forms.EmailInput(attrs={"autocomplete": "email", "placeholder": "nombre@correo.com"}),
     )
+
+    def get_users(self, email):
+        # La cuenta demo es pública: no tiene sentido (ni es seguro) recuperar su contraseña
+        return (u for u in super().get_users(email) if u.email.lower() != settings.DEMO_EMAIL.lower())

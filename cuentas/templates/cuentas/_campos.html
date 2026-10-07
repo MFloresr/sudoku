@@ -4,12 +4,20 @@
 {% for campo in form %}
 <div class="flex flex-col gap-1.5">
   <label for="{{ campo.id_for_label }}" class="text-sm font-bold">{{ campo.label }}</label>
+  {% if campo.field.widget.input_type == 'password' %}<div class="relative" x-data="{ ver: false }">{% endif %}
   <input type="{{ campo.field.widget.input_type }}" name="{{ campo.html_name }}" id="{{ campo.id_for_label }}"
          value="{% if campo.field.widget.input_type != 'password' %}{{ campo.value|default_if_none:'' }}{% endif %}"
          {% for k, v in campo.field.widget.attrs.items %}{{ k }}="{{ v }}" {% endfor %}
+         {% if campo.field.widget.input_type == 'password' %}:type="ver ? 'text' : 'password'"{% endif %}
          {% if campo.field.required %}required{% endif %}
          {% if campo.errors %}aria-invalid="true" aria-describedby="{{ campo.id_for_label }}-error"{% endif %}
-         class="input h-12.5 w-full rounded-[14px] border-[#CFC8B8] bg-white text-base {% if campo.errors %}input-error{% endif %}">
+         class="input h-12.5 w-full rounded-[14px] border-[#CFC8B8] bg-white text-base {% if campo.field.widget.input_type == 'password' %}pr-12{% endif %} {% if campo.errors %}input-error{% endif %}">
+  {% if campo.field.widget.input_type == 'password' %}
+  <button type="button" @click="ver = !ver" :aria-label="ver ? 'Ocultar contraseña' : 'Mostrar contraseña'" :aria-pressed="ver" class="absolute right-1.5 bottom-1.5 flex size-10 items-center justify-center rounded-lg text-tenue hover:text-tinta">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+  </button>
+  </div>
+  {% endif %}
   {% if campo.errors %}<p id="{{ campo.id_for_label }}-error" class="text-sm text-error">{{ campo.errors|join:" " }}</p>{% endif %}
 </div>
 {% endfor %}

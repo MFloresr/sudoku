@@ -1,0 +1,6 @@
+<div class="flex items-center gap-3 text-[13px] text-tenue" aria-hidden="true"><span class="h-px flex-1 bg-linea"></span>o<span class="h-px flex-1 bg-linea"></span></div>
+<form method="post" action="{% url 'demo' %}" class="flex flex-col gap-2">
+  {% csrf_token %}
+  <button type="submit" class="btn h-12.5 rounded-2xl border-linea bg-white text-base font-extrabold text-tinta hover:border-tinta hover:bg-white">Probar la demo</button>
+  <p class="text-center text-[13px] text-tenue">Cuenta de ejemplo con partidas ficticias. Lo que cambies se reinicia solo.</p>
+</form>
